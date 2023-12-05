@@ -12,6 +12,7 @@ jobs:
       - name: 'Build Storybook'
         shell: bash
         run: |
+          yarn set version stable
           yarn install
           yarn build-storybook
       - name: 'Upload storybook artifact'
