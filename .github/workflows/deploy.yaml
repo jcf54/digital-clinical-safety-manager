@@ -6,6 +6,9 @@ on:
 jobs:
   build-deploy-storybook:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pages: write
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
