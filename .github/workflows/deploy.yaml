@@ -19,7 +19,7 @@ jobs:
       - name: 'Upload storybook artifact'
         uses: actions/upload-pages-artifact@v2
         with: 
-          path: $GITHUB_WORKSPACE/frontend/storybook-static
+          path: ${{ github.workspace }}/frontend/storybook-static
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
