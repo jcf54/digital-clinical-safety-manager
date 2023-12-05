@@ -17,9 +17,9 @@ jobs:
           yarn install
           yarn build-storybook
       - name: 'Upload storybook artifact'
-        uses: actions/upload-pages-artifact@v1.0.4
+        uses: actions/upload-pages-artifact@v2
         with: 
-          path: "/frontend/storybook-static"
+          path: $GITHUB_WORKSPACE/frontend/storybook-static
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
         with:
