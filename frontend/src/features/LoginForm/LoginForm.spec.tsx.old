@@ -1,0 +1,68 @@
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import * as stories from './LoginForm.stories';
+import { composeStories } from '@storybook/react';
+
+
+const { SuccessfulLogin, UnsuccessfulLogin, HTTPErrorOnLogin } = composeStories(stories);
+
+
+test("if the credentials are correct, log the user in", async () => {
+    render(<SuccessfulLogin />);
+
+    expect(screen.getByRole('textbox', { name: /trust username/i})).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login/i})).toBeInTheDocument();
+
+    // Populate the form
+    fireEvent.input(screen.getByRole('textbox', { name: /trust username/i}), { target: { value: 'john.doe5' }});
+    fireEvent.input(screen.getByLabelText(/password/i), { target: { value: 'password' }});
+    fireEvent.click(screen.getByRole('button', { name: /login/i}));
+
+    // Check that the user is logged in
+    await waitFor(() => screen.getByText(/logged in!/i))
+})
+
+test("if the credentials are incorrect, display an error", async () => {
+    render(<UnsuccessfulLogin />);
+
+    expect(screen.getByRole('textbox', { name: /trust username/i})).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login/i})).toBeInTheDocument();
+
+    // Populate the form
+    fireEvent.input(screen.getByRole('textbox', { name: /trust username/i}), { target: { value: 'john.doe5' }});
+    fireEvent.input(screen.getByLabelText(/password/i), { target: { value: 'password' }});
+    fireEvent.click(screen.getByRole('button', { name: /login/i}));
+
+    // Check that the user is logged in
+    await waitFor(() => screen.getByText(/the username or password provided is incorrect/i))
+})
+
+test("if the server returns an error, display an error", async () => {
+    render(<HTTPErrorOnLogin />);
+
+    expect(screen.getByRole('textbox', { name: /trust username/i})).toBeInTheDocument();
+    
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login/i})).toBeInTheDocument();
+
+    // Populate the form
+    fireEvent.input(screen.getByRole('textbox', { name: /trust username/i}), { target: { value: 'john.doe5' }});
+    fireEvent.input(screen.getByLabelText(/password/i), { target: { value: 'password' }});
+    fireEvent.click(screen.getByRole('button', { name: /login/i}));
+
+    // Check that the user is logged in
+    await waitFor(() => screen.getByText(/an unknown error has occured/i))
+})
+
+test("incomplete form displays error to user", async () => {
+    render(<SuccessfulLogin />);
+
+    // Submit the form
+    fireEvent.click(screen.getByRole('button', { name: /login/i}));
+
+    // Check errors are presented
+    await waitFor(() => screen.getByText(/username is required/i))
+    await waitFor(() => screen.getByText(/password is required/i))
+})
