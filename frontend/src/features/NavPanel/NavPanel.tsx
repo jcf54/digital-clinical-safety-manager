@@ -1,18 +1,18 @@
 import React from "react";
-import { Code, Group, Menu, NavLink, ScrollArea, Select } from "@mantine/core";
+import { Code, Group, Menu, NavLink, ScrollArea, Select, rem } from "@mantine/core";
 import UserButton from "./components/UserButton/UserButton";
 import classes from './NavPanel.module.css';
 import { useNavigate } from "react-router-dom";
-import { IconFolders, IconHome2, IconSettings, IconUsersGroup } from "@tabler/icons-react";
+import { IconDoorExit, IconFolders, IconHome2, IconSettings, IconUsersGroup } from "@tabler/icons-react";
 
 interface NavPanelProps {
-  onOverview: boolean;
-  onProjects: boolean;
-  onOrganisations: boolean;
-  onSettings: boolean;
+  onOverview?: boolean;
+  onProjects?: boolean;
+  onTeams?: boolean;
+  onSettings?: boolean;
 }
 
-const NavPanel = ({onOverview, onProjects, onOrganisations, onSettings}: NavPanelProps) => {
+const NavPanel = ({onOverview, onProjects, onTeams, onSettings}: NavPanelProps) => {
   const navigate = useNavigate();
   return (
     <nav className={classes.navbar}>
@@ -37,10 +37,10 @@ const NavPanel = ({onOverview, onProjects, onOrganisations, onSettings}: NavPane
           onClick={() => navigate('/projects', {replace: true})}
         />
         <NavLink
-          label="Organisations"
+          label="Teams"
           leftSection={<IconUsersGroup size="1rem" stroke={1.5} />}
-          active={onOrganisations}
-          onClick={() => navigate('/organisations', {replace: true})}
+          active={onTeams}
+          onClick={() => navigate('/teams', {replace: true})}
         />
         <NavLink
           label="Settings"
@@ -60,11 +60,18 @@ const NavPanel = ({onOverview, onProjects, onOrganisations, onSettings}: NavPane
             <Menu.Label>
               Settings
             </Menu.Label>
-            <Menu.Item onClick={() => navigate('/settings/account', {replace: true})}>
+            <Menu.Item
+              onClick={() => navigate('/settings/account', {replace: true})}
+              leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
+            >
               Account settings
             </Menu.Item>
             <Menu.Divider />
-            <Menu.Item color="red" onClick={() => navigate('/logout', {replace: true})}>
+            <Menu.Item
+              color="red"
+              onClick={() => navigate('/logout', {replace: true})}
+              leftSection={<IconDoorExit style={{ width: rem(14), height: rem(14) }} />}
+            >
               Logout
             </Menu.Item>
           </Menu.Dropdown>

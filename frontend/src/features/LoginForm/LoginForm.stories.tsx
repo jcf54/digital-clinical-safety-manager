@@ -23,13 +23,16 @@ const successfulLoginMock: LoginAPIResponse = {
 };
 
 export const SuccessfulLogin: Story = {
-  render: () => {
+  args: {
+    allowLocalAuth: true,
+  },
+  render: (args) => {
     fetchMock.restore().mock('end:/api/auth/login/', successfulLoginMock, { delay: 250 });
     return (
       <MemoryRouter initialEntries={['/login']}>
         <Routes>
           <Route path="/" element={<h1>Logged in!</h1>} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route path="/login" element={<LoginForm {...args} />} />
         </Routes>
       </MemoryRouter>
     );
@@ -37,13 +40,16 @@ export const SuccessfulLogin: Story = {
 }
 
 export const UnsuccessfulLogin: Story = {
-  render: () => {
+  args: {
+    allowLocalAuth: true,
+  },
+  render: (args) => {
     fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 401, body: {detail: 'The username or password provided is incorrect'}}});
     return (
       <MemoryRouter initialEntries={['/login']}>
         <Routes>
           <Route path="/" element={<h1>Logged in!</h1>} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route path="/login" element={<LoginForm {...args} />} />
         </Routes>
       </MemoryRouter>
     );

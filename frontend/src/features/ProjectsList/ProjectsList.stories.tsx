@@ -1,29 +1,25 @@
 import React from 'react';
-import NavPanel from './NavPanel';
+import ProjectsList from './ProjectsList';
 import { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 const meta = {
-  title: 'Features/Nav panel',
-  component: NavPanel,
-} as Meta<typeof NavPanel>;
+  title: 'Features/Projects list',
+  component: ProjectsList,
+} as Meta<typeof ProjectsList>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-
 export const Default: Story = {
   args: {
-    onOverview: true,
-    onProjects: false,
-    onTeams: false,
-    onSettings: false,
+
   },
   render: (args) => {
     return (
       <MemoryRouter initialEntries={['/']}>
         <Routes>
-          <Route path="/" element={<NavPanel {...args} />} />
+          <Route path="/" element={<ProjectsList {...args} />} />
         </Routes>
       </MemoryRouter>
     );

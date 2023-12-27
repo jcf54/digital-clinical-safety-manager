@@ -22,10 +22,14 @@ export type LoginAPIResponse = {
   scopes: string[];
 }
 
-const LoginForm = () => {
+interface LoginFormProps {
+  allowLocalAuth: boolean;
+}
+
+const LoginForm = ({allowLocalAuth}: LoginFormProps) => {
   const { data, error, loading, submitFn } = useREST<LoginInput, LoginAPIResponse>('POST', '/auth/login/');
   const { register, handleSubmit, formState: { errors: formErrors } } = useForm<LoginInput>();
-  const [loginMethod, setLoginMethod] = React.useState<'local' | 'ldap'>('local');
+  const [ loginMethod, setLoginMethod ] = React.useState<'local' | 'ldap'>(allowLocalAuth ? 'local' : 'ldap');
   const { updateUser } = useContext(UserAuthContext);
   const navigate = useNavigate();
 
@@ -63,16 +67,16 @@ const LoginForm = () => {
           {error?.detail}
         </Alert>
         
-        <Tabs defaultValue="local-user" value={loginMethod} onChange={(value) => setLoginMethod(value as 'local' | 'ldap')}> 
+        <Tabs defaultValue={allowLocalAuth ? 'local' : 'ldap'} value={loginMethod} onChange={(value) => setLoginMethod(value as 'local' | 'ldap')}> 
           <Tabs.List>
-            <Tabs.Tab disabled={loading} value="local">Local user</Tabs.Tab>
+            {allowLocalAuth && <Tabs.Tab disabled={loading} value="local">Local user</Tabs.Tab>}
             <Tabs.Tab disabled={loading} value="ldap">LDAP user</Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value='local'>
             <Space h="lg" />
             <LoadingOverlay visible={loading} />
-            <form onSubmit={handleSubmit(submitFn)}>
+            <form onSubmit={handleSubmit(onLogin)}>
               <TextInput label="Username" required {...usernameProps} error={formErrors?.username?.message} />
               <PasswordInput label="Password" required mt="md" {...passwordProps} error={formErrors?.password?.message} />
               <Group justify="space-between" mt="lg">
