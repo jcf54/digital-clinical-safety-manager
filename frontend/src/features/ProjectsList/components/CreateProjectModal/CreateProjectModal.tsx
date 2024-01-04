@@ -24,7 +24,7 @@ const CreateProjectModal = ({ opened, onClose, onSuccess }: CreateProjectModalPr
   // because it saves the user having to log out and back in again
 
   const { data: teams, error: teamsError, loading: teamsLoading, submitFn: getTeamsFn } = useREST<null, Team[]>('GET', '/users/@me/teams');
-  const { data: project, error: projectError, loading: projectLoading, submitFn: createProjectFn } = useREST<AddProjectFormValues, Project>('POST', '/projects');
+  const { data: project, error: projectError, loading: projectLoading, submitFn: createProjectFn } = useREST<AddProjectFormValues, Project>('POST', '/projects/');
 
   useEffect(() => {
     getTeamsFn();

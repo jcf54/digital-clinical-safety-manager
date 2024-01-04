@@ -1,16 +1,24 @@
-import { Button, Table, Group, Pagination, Alert } from "@mantine/core";
+import { Button, Table, Group, Pagination, Alert, Loader, LoadingOverlay } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from './ProjectsList.module.css';
 import CreateProjectModal from "./components/CreateProjectModal/CreateProjectModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useREST from "../../hooks/useREST";
+import Project from "../../types/Project";
 
 const ProjectsList = () => {
   const [addProjectModalOpened, {open: openAddProjectModal, close: closeAddProjectModal}] = useDisclosure();
+  const {data: projects, loading: projectsLoading, error: projectsError, submitFn: getProjectsFn} = useREST<null, Project[]>('GET', '/projects/');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    getProjectsFn();
+  }, []);
+
   return (
     <div>
-      { successMessage && <Alert color="green" title="Success" mb="md">{successMessage}</Alert>}
-
+      { successMessage && <Alert color="green" title="Success creating project" mb="md">{successMessage}</Alert>}
+      { projectsError && <Alert color="red" title="Error retrieving projects" mb="md">{projectsError.detail}</Alert>}
       <Button color="blue" mb="md" onClick={() => openAddProjectModal()}>Create new project</Button>
       <Table highlightOnHover mb="md">
         <Table.Thead>
@@ -26,26 +34,20 @@ const ProjectsList = () => {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          <Table.Tr key='PROJ1'>
-            <Table.Td className={classes.underlineText}>Test project</Table.Td>
-            <Table.Td>PROJ-TEST-01</Table.Td>
-            <Table.Td>Jane Doe</Table.Td>
-            <Table.Td>Thingology</Table.Td>
-            <Table.Td>4</Table.Td>
-            <Table.Td>3</Table.Td>
-            <Table.Td>5</Table.Td>
-            <Table.Td>16</Table.Td>
-          </Table.Tr>
-          <Table.Tr key='PROJ2'>
-            <Table.Td className={classes.underlineText}>Psychological medicine SMS manager</Table.Td>
-            <Table.Td>PROJ-PSYMED-3</Table.Td>
-            <Table.Td>Joe Channing</Table.Td>
-            <Table.Td>Clinical Haematology</Table.Td>
-            <Table.Td>2</Table.Td>
-            <Table.Td>1</Table.Td>
-            <Table.Td>3</Table.Td>
-            <Table.Td>8</Table.Td>
-          </Table.Tr>
+          {
+            projects?.map(project => (
+              <Table.Tr key={project.id}>
+                <Table.Td className={classes.underlineText}>{project.name}</Table.Td>
+                <Table.Td>{project.internalReference}</Table.Td>
+                <Table.Td>{project.developmentLead.firstName}&nbsp;{project.developmentLead.lastName}</Table.Td>
+                <Table.Td>{project.team.name}</Table.Td>
+                <Table.Td>-</Table.Td>
+                <Table.Td>-</Table.Td>
+                <Table.Td>-</Table.Td>
+                <Table.Td>-</Table.Td>
+              </Table.Tr>
+            ))
+          }
         </Table.Tbody>
       </Table>
       <Group justify="center">
