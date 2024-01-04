@@ -1,18 +1,11 @@
 import React from "react";
-import { Code, Group, Menu, NavLink, ScrollArea, Select, rem } from "@mantine/core";
+import { Code, Group, Menu, NavLink, ScrollArea, rem } from "@mantine/core";
 import UserButton from "./components/UserButton/UserButton";
 import classes from './NavPanel.module.css';
 import { useNavigate } from "react-router-dom";
 import { IconDoorExit, IconFolders, IconHome2, IconSettings, IconUsersGroup } from "@tabler/icons-react";
 
-interface NavPanelProps {
-  onOverview?: boolean;
-  onProjects?: boolean;
-  onTeams?: boolean;
-  onSettings?: boolean;
-}
-
-const NavPanel = ({onOverview, onProjects, onTeams, onSettings}: NavPanelProps) => {
+const NavPanel = () => {
   const navigate = useNavigate();
   return (
     <nav className={classes.navbar}>
@@ -27,25 +20,27 @@ const NavPanel = ({onOverview, onProjects, onTeams, onSettings}: NavPanelProps) 
         <NavLink
           label="Overview"
           leftSection={<IconHome2 size="1rem" stroke={1.5} />}
-          active={onOverview}
+          active={location.pathname === '/'}
           onClick={() => navigate('/', {replace: true})}
         />
         <NavLink
           label="Projects"
           leftSection={<IconFolders size="1rem" stroke={1.5} />}
-          active={onProjects}
-          onClick={() => navigate('/projects', {replace: true})}
-        />
+          active={location.pathname.startsWith('/projects')}
+        >
+          <NavLink label="PROJ-TEST-01" active />
+          <NavLink label="PROJ-PSYMED-03" />
+        </NavLink>
         <NavLink
           label="Teams"
           leftSection={<IconUsersGroup size="1rem" stroke={1.5} />}
-          active={onTeams}
+          active={location.pathname.startsWith('/teams')}
           onClick={() => navigate('/teams', {replace: true})}
         />
         <NavLink
           label="Settings"
           leftSection={<IconSettings size="1rem" stroke={1.5} />}
-          active={onSettings}
+          active={location.pathname.startsWith('/settings')}
           onClick={() => navigate('/settings/account', {replace: true})}
         />
       </ScrollArea>
