@@ -4,12 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import useREST from '../../hooks/useREST';
 import { UserAuthContext } from '../../app/contexts/UserAuthContext';
 import User from '../../types/User';
-import { Paper, Text, TextInput, Group, Button, Anchor, PasswordInput, Container, Title, Alert, Tabs, Space, LoadingOverlay } from '@mantine/core';
+import { Paper, TextInput, Button, PasswordInput, Container, Title, Alert, Tabs, Space, LoadingOverlay } from '@mantine/core';
 
 type LoginInput = {
   username: string;
   password: string;
-  loginMethod?: 'local' | 'ldap';
 }
 
 export type LoginAPIResponse = {
@@ -17,19 +16,23 @@ export type LoginAPIResponse = {
     username: string;
     firstName: string;
     lastName: string;
-    isActive: boolean;
   },
   scopes: string[];
 }
 
-interface LoginFormProps {
-  allowLocalAuth: boolean;
+type ConfigAPIResponse = {
+  ldapDomain: string;
 }
 
-const LoginForm = ({allowLocalAuth}: LoginFormProps) => {
+const LoginForm = () => {
   const { data, error, loading, submitFn } = useREST<LoginInput, LoginAPIResponse>('POST', '/auth/login/');
+  const { data: config, error: configError, submitFn: configSubmitFn } = useREST<null, ConfigAPIResponse>('GET', '/config/');
+
+  useEffect(() => {
+    configSubmitFn();
+  }, [])
+
   const { register, handleSubmit, formState: { errors: formErrors } } = useForm<LoginInput>();
-  const [ loginMethod, setLoginMethod ] = React.useState<'local' | 'ldap'>(allowLocalAuth ? 'local' : 'ldap');
   const { updateUser } = useContext(UserAuthContext);
   const navigate = useNavigate();
 
@@ -44,14 +47,7 @@ const LoginForm = ({allowLocalAuth}: LoginFormProps) => {
       updateUser(user);
       navigate('/', { replace: true });
     }
-  }, [data, updateUser, navigate])
-
-  const onLogin = (data: LoginInput) => {
-    submitFn({
-      ...data,
-      loginMethod
-    })
-  }
+  }, [data, updateUser, navigate]);
 
   const usernameProps = register('username');
   const passwordProps = register('password');
@@ -63,42 +59,24 @@ const LoginForm = ({allowLocalAuth}: LoginFormProps) => {
       </Title>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md" pos='relative'>
+        <Alert color='red' title='Error' hidden={!configError} mb='md'>
+          Error getting application config: {configError?.detail}
+        </Alert>
+
         <Alert color='red' title='Error' hidden={!error} mb='md'>
-          {error?.detail}
+          Error when authenticating: {error?.detail}
         </Alert>
         
-        <Tabs defaultValue={allowLocalAuth ? 'local' : 'ldap'} value={loginMethod} onChange={(value) => setLoginMethod(value as 'local' | 'ldap')}> 
+        <Tabs defaultValue='ldap'> 
           <Tabs.List>
-            {allowLocalAuth && <Tabs.Tab disabled={loading} value="local">Local user</Tabs.Tab>}
             <Tabs.Tab disabled={loading} value="ldap">LDAP user</Tabs.Tab>
           </Tabs.List>
-
-          <Tabs.Panel value='local'>
-            <Space h="lg" />
-            <LoadingOverlay visible={loading} />
-            <form onSubmit={handleSubmit(onLogin)}>
-              <TextInput label="Username" required {...usernameProps} error={formErrors?.username?.message} />
-              <PasswordInput label="Password" required mt="md" {...passwordProps} error={formErrors?.password?.message} />
-              <Group justify="space-between" mt="lg">
-                <Anchor component="button" size="sm">
-                  Forgot password?
-                </Anchor>
-              </Group>
-              <Button fullWidth mt="lg" type="submit">Sign in</Button>
-              <Text c="dimmed" size="sm" ta="center" mt={25}>
-                Don't have an account yet?{' '}
-                <Anchor size="sm" component="button">
-                  Create account
-                </Anchor>
-              </Text>
-            </form>
-          </Tabs.Panel>
 
           <Tabs.Panel value='ldap'>
             <Space h="lg" />
             <LoadingOverlay visible={loading} />
             <form onSubmit={handleSubmit(submitFn)}>
-              <TextInput rightSection={<span>@domain.local</span>} rightSectionWidth="120px" label="Username" required {...usernameProps} error={formErrors?.username?.message} />
+              <TextInput rightSection={<span>{config ? <span>@{config.ldapDomain}</span> : ''}</span>} rightSectionWidth="120px" label="Username" required {...usernameProps} error={formErrors?.username?.message} />
               <PasswordInput label="Password" required mt="md" {...passwordProps} error={formErrors?.password?.message} />
               <Button fullWidth mt="lg" type="submit">Sign in</Button>
             </form>

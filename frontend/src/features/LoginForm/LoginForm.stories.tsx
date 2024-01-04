@@ -17,22 +17,19 @@ const successfulLoginMock: LoginAPIResponse = {
     username: 'john.doe5',
     firstName: 'John',
     lastName: 'Doe',
-    isActive: true,
   },
   scopes: ['user'],
 };
 
 export const SuccessfulLogin: Story = {
-  args: {
-    allowLocalAuth: true,
-  },
-  render: (args) => {
+  render: () => {
     fetchMock.restore().mock('end:/api/auth/login/', successfulLoginMock, { delay: 250 });
+    fetchMock.mock('end:/api/config/', { ldapDomain: 'example.local' }, { delay: 250 });
     return (
       <MemoryRouter initialEntries={['/login']}>
         <Routes>
           <Route path="/" element={<h1>Logged in!</h1>} />
-          <Route path="/login" element={<LoginForm {...args} />} />
+          <Route path="/login" element={<LoginForm />} />
         </Routes>
       </MemoryRouter>
     );
@@ -40,16 +37,29 @@ export const SuccessfulLogin: Story = {
 }
 
 export const UnsuccessfulLogin: Story = {
-  args: {
-    allowLocalAuth: true,
-  },
-  render: (args) => {
+  render: () => {
     fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 401, body: {detail: 'The username or password provided is incorrect'}}});
+    fetchMock.mock('end:/api/config/', { ldapDomain: 'example.local' }, { delay: 250 });
     return (
       <MemoryRouter initialEntries={['/login']}>
         <Routes>
           <Route path="/" element={<h1>Logged in!</h1>} />
-          <Route path="/login" element={<LoginForm {...args} />} />
+          <Route path="/login" element={<LoginForm />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  },
+}
+
+export const UserNotActiveOrAllowed: Story = {
+  render: () => {
+    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 403, body: {detail: 'this user account is not active. Please contact a system administrator'}}});
+    fetchMock.mock('end:/api/config/', { ldapDomain: 'example.local' }, { delay: 250 });
+    return (
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route path="/" element={<h1>Logged in!</h1>} />
+          <Route path="/login" element={<LoginForm />} />
         </Routes>
       </MemoryRouter>
     );
@@ -58,7 +68,8 @@ export const UnsuccessfulLogin: Story = {
 
 export const HTTPErrorOnLogin: Story = {
   render: () => {
-    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 500, body: {detail: 'An unknown error has occured'}}});
+    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 500, body: {detail: 'an unknown error has occured'}}});
+    fetchMock.mock('end:/api/config/', {}, { delay: 250, response: {status: 500, body: {detail: 'an unknown error has occured'}}});
     return (
       <MemoryRouter initialEntries={['/login']}>
         <Routes>
