@@ -53,7 +53,7 @@ export const UnsuccessfulLogin: Story = {
 
 export const UserNotActiveOrAllowed: Story = {
   render: () => {
-    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 403, body: {detail: 'this user account is not active. Please contact a system administrator'}}});
+    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 403, body: {detail: 'This user account is not active. Please contact a system administrator'}}});
     fetchMock.mock('end:/api/config/', { ldapDomain: 'example.local' }, { delay: 250 });
     return (
       <MemoryRouter initialEntries={['/login']}>
@@ -68,8 +68,8 @@ export const UserNotActiveOrAllowed: Story = {
 
 export const HTTPErrorOnLogin: Story = {
   render: () => {
-    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 500, body: {detail: 'an unknown error has occured'}}});
-    fetchMock.mock('end:/api/config/', {}, { delay: 250, response: {status: 500, body: {detail: 'an unknown error has occured'}}});
+    fetchMock.restore().mock('end:/api/auth/login/', {}, { delay: 250, response: {status: 500, body: {detail: 'An unknown error has occured'}}});
+    fetchMock.mock('end:/api/config/', {}, { delay: 250, response: {status: 500, body: {detail: 'An unknown error has occured'}}});
     return (
       <MemoryRouter initialEntries={['/login']}>
         <Routes>

@@ -59,12 +59,12 @@ const LoginForm = () => {
       </Title>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md" pos='relative'>
-        <Alert color='red' title='Error' hidden={!configError} mb='md'>
-          Error getting application config: {configError?.detail}
+        <Alert color='red' title='Error retrieving application configuration' hidden={!configError} mb='md'>
+          {configError?.detail}
         </Alert>
 
-        <Alert color='red' title='Error' hidden={!error} mb='md'>
-          Error when authenticating: {error?.detail}
+        <Alert color='red' title='Error authenticating' hidden={!error} mb='md'>
+          {error?.detail}
         </Alert>
         
         <Tabs defaultValue='ldap'> 
