@@ -3,7 +3,7 @@ import { IconChevronRight } from '@tabler/icons-react';
 import classes from './UserButton.module.css';
 import { forwardRef } from "react";
 
-interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'> {
+interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'>{
   avatarUrl: string;
   name: string;
   email: string;
