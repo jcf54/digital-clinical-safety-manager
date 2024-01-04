@@ -15,7 +15,7 @@ interface AddProjectFormValues {
 type CreateProjectModalProps = {
   opened: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (project: Project) => void;
 }
 
 const CreateProjectModal = ({ opened, onClose, onSuccess }: CreateProjectModalProps) => {
@@ -122,7 +122,7 @@ const CreateProjectModal = ({ opened, onClose, onSuccess }: CreateProjectModalPr
 
   useEffect(() => {
     if (project) {
-      onSuccess();
+      onSuccess(project);
       onClose();
     }
   }, [project])

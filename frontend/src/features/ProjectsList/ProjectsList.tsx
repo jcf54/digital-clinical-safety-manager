@@ -1,13 +1,16 @@
-import { Button, Table, Group, Pagination } from "@mantine/core";
+import { Button, Table, Group, Pagination, Alert } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from './ProjectsList.module.css';
 import CreateProjectModal from "./components/CreateProjectModal/CreateProjectModal";
+import { useState } from "react";
 
 const ProjectsList = () => {
   const [addProjectModalOpened, {open: openAddProjectModal, close: closeAddProjectModal}] = useDisclosure();
-
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   return (
     <div>
+      { successMessage && <Alert color="green" title="Success" mb="md">{successMessage}</Alert>}
+
       <Button color="blue" mb="md" onClick={() => openAddProjectModal()}>Create new project</Button>
       <Table highlightOnHover mb="md">
         <Table.Thead>
@@ -26,8 +29,8 @@ const ProjectsList = () => {
           <Table.Tr key='PROJ1'>
             <Table.Td className={classes.underlineText}>Test project</Table.Td>
             <Table.Td>PROJ-TEST-01</Table.Td>
-            <Table.Td>Joe Channing</Table.Td>
-            <Table.Td>Clinical Haematology</Table.Td>
+            <Table.Td>Jane Doe</Table.Td>
+            <Table.Td>Thingology</Table.Td>
             <Table.Td>4</Table.Td>
             <Table.Td>3</Table.Td>
             <Table.Td>5</Table.Td>
@@ -48,7 +51,11 @@ const ProjectsList = () => {
       <Group justify="center">
         <Pagination total={2} />
       </Group>
-      <CreateProjectModal opened={addProjectModalOpened} onClose={closeAddProjectModal} onSuccess={() => {}} />
+      <CreateProjectModal
+        opened={addProjectModalOpened}
+        onClose={closeAddProjectModal}
+        onSuccess={(project) => setSuccessMessage(`${project.name} (${project.internalReference}) created successfully!`)}
+      />
     </div>
   )
 }
