@@ -4,8 +4,8 @@ type Team = {
     id: number;
     name: string;
 
-    owner: User;
-    members: User[];
+    owner: Omit<User, 'scopes'>;
+    members: Omit<User, 'scopes'>[];
 }
 
 export default Team;

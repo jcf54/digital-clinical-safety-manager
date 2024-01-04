@@ -6,7 +6,7 @@ type Project = {
   name: string;
   internalReference: string;
   team: Team;
-  developmentLead: User;
+  developmentLead: Omit<User, 'scopes'>;
 
   createdAt: Date;
   updatedAt: Date;
