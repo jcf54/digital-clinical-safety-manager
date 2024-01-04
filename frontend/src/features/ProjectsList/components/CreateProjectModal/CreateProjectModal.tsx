@@ -1,28 +1,30 @@
-import { Button, Modal, TextInput, Group, NativeSelect, Alert } from "@mantine/core";
+import { Button, Modal, TextInput, Group, NativeSelect, Alert, LoadingOverlay } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { useCallback, useEffect } from "react";
 import useREST from "../../../../hooks/useREST";
 import Team from "../../../../types/Team";
-import { add } from "date-fns";
+import Project from "../../../../types/Project";
 
 interface AddProjectFormValues {
   projectName: string;
   internalReference: string;
-  team?: string;
-  developmentLead?: string;
+  teamId?: string;
+  developmentLeadUsername?: string;
 }
 
 type CreateProjectModalProps = {
-    opened: boolean;
-    onClose: () => void;
+  opened: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
-const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
+const CreateProjectModal = ({ opened, onClose, onSuccess }: CreateProjectModalProps) => {
   // Get the current user's teams from the API
   // We do this here and don't just use the user context
   // because it saves the user having to log out and back in again
 
   const { data: teams, error: teamsError, loading: teamsLoading, submitFn: getTeamsFn } = useREST<null, Team[]>('GET', '/users/@me/teams');
+  const { data: project, error: projectError, loading: projectLoading, submitFn: createProjectFn } = useREST<AddProjectFormValues, Project>('POST', '/projects');
 
   useEffect(() => {
     getTeamsFn();
@@ -32,8 +34,8 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
     initialValues: {
       projectName: '',
       internalReference: '',
-      team: '',
-      developmentLead: '',
+      teamId: '',
+      developmentLeadUsername: '',
     },
   });
 
@@ -50,8 +52,8 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
     if (teams && teams.length > 0) {
       // Set the default team to the first team in the list
       addProjectForm.setValues({
-        team: teams[0].id.toString(),
-        developmentLead: teams[0].owner.username.toString(),
+        teamId: teams[0].id.toString(),
+        developmentLeadUsername: teams[0].owner.username.toString(),
       });
     }
   }, [teams])
@@ -63,8 +65,8 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
     let errors: {
       projectName?: string;
       internalReference?: string;
-      team?: string;
-      developmentLead?: string;
+      teamId?: string;
+      developmentLeadUsername?: string;
     } = {};
 
     if (addProjectForm.values.projectName === '') {
@@ -73,29 +75,28 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
     if (addProjectForm.values.internalReference === '') {
       errors.internalReference = 'Internal reference is required';
     }
-    if (addProjectForm.values.team === '') {
-      addProjectForm.setValues({developmentLead: ''});
+    if (addProjectForm.values.teamId === '') {
+      addProjectForm.setValues({ developmentLeadUsername: '' });
     }
 
-    if (errors.projectName || errors.internalReference || errors.team || errors.developmentLead) {
+    if (errors.projectName || errors.internalReference || errors.teamId || errors.developmentLeadUsername) {
       addProjectForm.setErrors(errors);
       return;
     }
 
-    // If we get here, the form is valid
-    // Submit the form!
+    createProjectFn(addProjectForm.values);
   }
 
   const getTeamMembers = useCallback(() => {
-    const dropdownOptions: {label: string, value: string}[] = [];
+    const dropdownOptions: { label: string, value: string }[] = [];
 
     // If the team isn't set, do nothing
-    if (addProjectForm.values.team == '') {
-      return [{label: 'Select team...', value: ''}];
+    if (addProjectForm.values.teamId == '') {
+      return [{ label: 'Select team...', value: '' }];
     }
 
     const selectedTeam = teams?.find(
-      team => team.id.toString() === addProjectForm.values.team
+      team => team.id.toString() === addProjectForm.values.teamId
     );
 
     // If the team isn't set, do nothing
@@ -108,7 +109,7 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
       label: selectedTeam?.owner.firstName + ' ' + selectedTeam?.owner.lastName,
       value: selectedTeam?.owner.username.toString(),
     });
-  
+
     selectedTeam.members.forEach(member => {
       dropdownOptions.push({
         label: member.firstName + ' ' + member.lastName,
@@ -117,7 +118,14 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
     });
 
     return dropdownOptions;
-  }, [addProjectForm.values.team]);
+  }, [addProjectForm.values.teamId]);
+
+  useEffect(() => {
+    if (project) {
+      onSuccess();
+      onClose();
+    }
+  }, [project])
 
   return (
     <Modal.Root opened={opened} onClose={onClose}>
@@ -128,16 +136,20 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
           <Modal.CloseButton />
         </Modal.Header>
         <Modal.Body>
-        <Alert color='red' title='Error' hidden={!teamsError} mb='md'>
-          Error getting teams: {teamsError?.detail}
-        </Alert>
-        <div>
+          <Alert color='red' title='Error retrieving teams' hidden={!teamsError} mb='md'>
+            {teamsError?.detail}
+          </Alert>
+          <Alert color='red' title='Error creating project' hidden={!projectError} mb='md'>
+            {projectError?.detail}
+          </Alert>
+          <div>
             <TextInput
               withAsterisk
               mb="md"
               label="Project name"
               placeholder="My fantastic new project"
               {...addProjectForm.getInputProps('projectName')}
+              disabled={teamsLoading || projectLoading}
             />
             <TextInput
               withAsterisk
@@ -145,32 +157,43 @@ const CreateProjectModal = ({opened, onClose}: CreateProjectModalProps) => {
               label="Internal project reference"
               placeholder="PROJ-BIGWOW-01"
               {...addProjectForm.getInputProps('internalReference')}
+              disabled={teamsLoading || projectLoading}
             />
             <NativeSelect
               label="Team"
               mb="md"
               placeholder="Select team"
-              {...addProjectForm.getInputProps('team')}
+              {...addProjectForm.getInputProps('teamId')}
+              disabled={teamsLoading || projectLoading}
               data={
-                teamsLoading ? [{value: '', label: 'Loading teams...'}] :
-                (
-                  teams?.map(team => (
-                    {label: team.name, value: team.id.toString()}
-                  ))
-                )
+                teamsLoading ? [{ value: '', label: 'Loading teams...' }] :
+                  (
+                    teams?.map(team => (
+                      { label: team.name, value: team.id.toString() }
+                    ))
+                  )
               }
             />
             <NativeSelect
               label="Development lead"
               mb="md"
               placeholder="Select user"
-              {...addProjectForm.getInputProps('developmentLead')}
+              {...addProjectForm.getInputProps('developmentLeadUsername')}
               data={getTeamMembers()}
+              disabled={teamsLoading || projectLoading}
             />
             <Group justify="flex-end">
-            <Button type="submit" variant="light" color="blue" onClick={() => handleAddProjectSubmit()}>Next</Button>
+              <Button
+                type="submit"
+                variant="light"
+                color="blue"
+                onClick={() => handleAddProjectSubmit()}
+                disabled={teamsLoading || projectLoading}
+              >
+                Next
+              </Button>
             </Group>
-        </div>
+          </div>
         </Modal.Body>
       </Modal.Content>
     </Modal.Root>

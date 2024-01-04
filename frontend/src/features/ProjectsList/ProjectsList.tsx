@@ -48,7 +48,7 @@ const ProjectsList = () => {
       <Group justify="center">
         <Pagination total={2} />
       </Group>
-      <CreateProjectModal opened={addProjectModalOpened} onClose={closeAddProjectModal} />
+      <CreateProjectModal opened={addProjectModalOpened} onClose={closeAddProjectModal} onSuccess={() => {}} />
     </div>
   )
 }

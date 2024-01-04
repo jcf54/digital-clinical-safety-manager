@@ -15,7 +15,8 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     opened: true,
-    onClose: () => {},
+    onClose: () => {alert('close')},
+    onSuccess: () => {alert('success')},
   },
   render: (args) => {
     fetchMock.restore().mock('end:/api/users/@me/teams', [
@@ -74,6 +75,48 @@ export const Default: Story = {
         ]
       }
     ], { delay: 250 });
+
+    fetchMock.mock('end:/api/projects', {
+      id: 1,
+      name: 'Test Project',
+      internalReference: 'test-project',
+      team: {
+        id: 1,
+        name: 'Clinical Haematology',
+        owner: {
+          id: 1,
+          username: 'owner',
+          firstName: 'Haem Owner',
+          lastName: 'User',
+          email: 'test@test.local'
+        },
+        members: [
+          {
+            id: 1,
+            username: 'memberone',
+            firstName: 'Haem Member',
+            lastName: 'One',
+            email: 'test@test.local'
+          },
+          {
+            id: 2,
+            username: 'test.user',
+            firstName: 'Haem Member',
+            lastName: 'Two',
+            email: 'test@test.local'
+          }
+        ]
+      },
+      developmentLead: {
+        id: 1,
+        username: 'memberone',
+        firstName: 'Haem Member',
+        lastName: 'One',
+        email: 'test@test.local'
+      },
+      createdAt: '2021-08-10T12:00:00Z',
+      updatedAt: '2021-08-10T12:00:00Z',
+    }, { delay: 250 });
 
     return (
       <MemoryRouter initialEntries={['/']}>
