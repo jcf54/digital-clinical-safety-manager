@@ -1,77 +1,10 @@
-import { Button, Modal, Table, TextInput, Group, PasswordInput, Pagination, NativeSelect } from "@mantine/core";
+import { Button, Table, Group, Pagination } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useForm } from '@mantine/form';
 import classes from './ProjectsList.module.css';
-import { useEffect } from "react";
-
-interface AddProjectFormValues {
-  projectName: string;
-  internalReference: string;
-  team?: string;
-  developmentLead?: string;
-  gitRepositoryUrl: string;
-  gitRepositoryUsername: string;
-  gitRepositoryPassword: string;
-}
+import CreateProjectModal from "./components/CreateProjectModal/CreateProjectModal";
 
 const ProjectsList = () => {
-  const [addProjectModalOpened, {open: openAddProjectModal, close: closeopenAddProjectModal}] = useDisclosure();
-
-  const addProjectForm = useForm<AddProjectFormValues>({
-    initialValues: {
-      projectName: '',
-      internalReference: '',
-      team: '',
-      developmentLead: '',
-      gitRepositoryUrl: '',
-      gitRepositoryUsername: '',
-      gitRepositoryPassword: '',
-    },
-  });
-
-  useEffect(() => {
-    if (addProjectModalOpened) {
-      addProjectForm.setValues({
-        projectName: '',
-        internalReference: '',
-        team: '',
-        developmentLead: '',
-        gitRepositoryUrl: '',
-        gitRepositoryUsername: '',
-        gitRepositoryPassword: '',
-      });
-    }
-  }, [addProjectModalOpened])
-
-  const handleAddProjectSubmit = () => {
-    // Check the form values are all valid
-    // If they are not, display error messages to the user
-    // If they are valid, move to the next step
-    let errors: {
-      projectName?: string;
-      internalReference?: string;
-      team?: string;
-      developmentLead?: string;
-    } = {};
-
-    if (addProjectForm.values.projectName === '') {
-      errors.projectName = 'Project name is required';
-    }
-    if (addProjectForm.values.internalReference === '') {
-      errors.internalReference = 'Internal reference is required';
-    }
-    if (addProjectForm.values.team === '') {
-      addProjectForm.setValues({developmentLead: ''});
-    }
-
-    if (errors.projectName || errors.internalReference || errors.team || errors.developmentLead) {
-      addProjectForm.setErrors(errors);
-      return;
-    }
-
-    // If we get here, the form is valid
-    // Submit the form!
-  }
+  const [addProjectModalOpened, {open: openAddProjectModal, close: closeAddProjectModal}] = useDisclosure();
 
   return (
     <div>
@@ -115,63 +48,8 @@ const ProjectsList = () => {
       <Group justify="center">
         <Pagination total={2} />
       </Group>
-      <Modal.Root opened={addProjectModalOpened} onClose={closeopenAddProjectModal}>
-        <Modal.Overlay />
-        <Modal.Content>
-          <Modal.Header>
-            <Modal.Title>Add project</Modal.Title>
-            <Modal.CloseButton />
-          </Modal.Header>
-          <Modal.Body>
-            <div>
-              <TextInput
-                withAsterisk
-                mb="md"
-                label="Project name"
-                placeholder="My fantastic new project"
-                {...addProjectForm.getInputProps('projectName')}
-              />
-              <TextInput
-                withAsterisk
-                mb="md"
-                label="Internal project reference"
-                placeholder="PROJ-BIGWOW-01"
-                {...addProjectForm.getInputProps('internalReference')}
-              />
-              <NativeSelect
-                label="Team"
-                mb="md"
-                placeholder="Select team"
-                {...addProjectForm.getInputProps('team')}
-                data={[
-                  {value: '', label: 'No team'},
-                  {value: '1', label: 'Clinical Haematology'},
-                  {value: '2', label: 'Testing Group'},
-                ]}
-              />
-              {
-                addProjectForm.values.team && (
-                  <NativeSelect
-                    label="Development lead"
-                    mb="md"
-                    placeholder="Select user"
-                    {...addProjectForm.getInputProps('developmentLead')}
-                    data={[
-                      {value: '', label: 'N/A'},
-                      {value: '1', label: 'Joe Channing'},
-                      {value: '2', label: 'Test User'},
-                    ]}
-                  />
-                )
-              }
-              <Group justify="flex-end">
-                <Button type="submit" variant="light" color="blue" onClick={() => handleAddProjectSubmit()}>Next</Button>
-              </Group>
-            </div>
-          </Modal.Body>
-        </Modal.Content>
-      </Modal.Root>
-    </div>    
+      <CreateProjectModal opened={addProjectModalOpened} onClose={closeAddProjectModal} />
+    </div>
   )
 }
 export default ProjectsList;
