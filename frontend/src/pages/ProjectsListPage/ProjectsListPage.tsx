@@ -12,7 +12,7 @@ const ProjectsListPage = () => {
       withBorder={false}
       padding="md"
     >
-      <AppShell.Navbar><NavPanel onProjects /></AppShell.Navbar>
+      <AppShell.Navbar><NavPanel /></AppShell.Navbar>
       <AppShell.Main><ProjectsList /></AppShell.Main>
     </AppShell>
   );

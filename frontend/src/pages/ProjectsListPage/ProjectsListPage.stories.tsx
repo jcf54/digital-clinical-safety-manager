@@ -17,9 +17,9 @@ export const Default: Story = {
   },
   render: (args) => {
     return (
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={['/projects']}>
         <Routes>
-          <Route path="/" element={<ProjectsListPage {...args} />} />
+          <Route path="/projects" element={<ProjectsListPage {...args} />} />
         </Routes>
       </MemoryRouter>
     );
