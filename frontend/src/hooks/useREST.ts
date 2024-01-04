@@ -8,7 +8,7 @@ interface RESTReturnType<InputType, returnType> {
     error: RESTError | null,
     loading: boolean,
     success: boolean,
-    submitFn: (input: InputType) => void,
+    submitFn: (input?: InputType) => void,
 }
 
 interface RESTError {
@@ -70,7 +70,7 @@ function useREST<InputType, ReturnType>(
     const [success, setSuccess] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const submitFn = async (input: InputType) => {
+    const submitFn = async (input?: InputType) => {
         setLoading(true);
         try {
             // Send the HTTP request
