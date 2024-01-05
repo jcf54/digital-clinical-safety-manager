@@ -164,3 +164,5 @@ cython_debug/
 !.yarn/releases
 !.yarn/plugins
 .pnp.*
+
+.DS_STORE
