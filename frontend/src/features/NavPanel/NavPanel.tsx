@@ -42,10 +42,7 @@ const NavPanel = () => {
           label="Projects"
           leftSection={<IconFolders size="1rem" stroke={1.5} />}
           active={location.pathname.startsWith('/projects')}
-        >
-          <NavLink label="PROJ-TEST-01" active />
-          <NavLink label="PROJ-PSYMED-03" />
-        </NavLink>
+        />
         <NavLink
           label="Teams"
           leftSection={<IconUsersGroup size="1rem" stroke={1.5} />}
