@@ -3,6 +3,7 @@ import ProjectsListPage from './ProjectsListPage';
 import { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import fetchMock from 'fetch-mock';
+import { MockUserAuthProvider } from '../../app/contexts/UserAuthContext';
 
 const meta = {
   title: 'Pages/Projects list',
@@ -164,11 +165,13 @@ export const Default: Story = {
     ], {delay: 250});
 
     return (
-      <MemoryRouter initialEntries={['/projects']}>
-        <Routes>
-          <Route path="/projects" element={<ProjectsListPage {...args} />} />
-        </Routes>
-      </MemoryRouter>
+      <MockUserAuthProvider>
+        <MemoryRouter initialEntries={['/projects']}>
+          <Routes>
+            <Route path="/projects" element={<ProjectsListPage {...args} />} />
+          </Routes>
+        </MemoryRouter>
+      </MockUserAuthProvider>
     );
   },
 }
@@ -281,11 +284,13 @@ export const ErrorState: Story = {
 
 
     return (
-      <MemoryRouter initialEntries={['/projects']}>
-        <Routes>
-          <Route path="/projects" element={<ProjectsListPage {...args} />} />
-        </Routes>
-      </MemoryRouter>
+      <MockUserAuthProvider>
+        <MemoryRouter initialEntries={['/projects']}>
+          <Routes>
+            <Route path="/projects" element={<ProjectsListPage {...args} />} />
+          </Routes>
+        </MemoryRouter>
+      </MockUserAuthProvider>
     );
   },
 }

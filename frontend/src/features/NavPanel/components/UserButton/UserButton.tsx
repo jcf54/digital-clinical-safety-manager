@@ -1,31 +1,32 @@
 import { Avatar, Group, UnstyledButton, Text, rem } from "@mantine/core"
 import { IconChevronRight } from '@tabler/icons-react';
 import classes from './UserButton.module.css';
-import { forwardRef } from "react";
+import { forwardRef, ComponentPropsWithoutRef, useContext } from "react";
+import { UserAuthContext } from "../../../../app/contexts/UserAuthContext";
 
-interface UserButtonProps extends React.ComponentPropsWithoutRef<'button'>{
-  avatarUrl: string;
-  name: string;
-  email: string;
-}
-
-const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(({avatarUrl, name, email, ...args}: UserButtonProps, ref) => {
+const UserButton = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<'button'>>(({ ...args}: ComponentPropsWithoutRef<'button'>, ref) => {
+  const { user } = useContext(UserAuthContext);
+  console.log(user);
   return (
     <UnstyledButton ref={ref} {...args} className={classes.user}>
       <Group>
         <Avatar
-          src={avatarUrl}
+          src={user?.thumbnailImage}
           radius="xl"
         />
         <div style={{ flex: 1 }}>
           <Text size="sm" fw={500}>
-            {name}
+            { user && `${user.firstName} ${user.lastName}` }
+            { !user && 'Not logged in'}
           </Text>
           <Text c="dimmed" size="xs">
-            {email}
+            {user?.username}
           </Text>
         </div>
-        <IconChevronRight style={{ width: rem(14), height: rem(14) }} stroke={1.5} />
+
+        { user && 
+          <IconChevronRight style={{ width: rem(14), height: rem(14) }} stroke={1.5} />
+        }
       </Group>
     </UnstyledButton>
   )

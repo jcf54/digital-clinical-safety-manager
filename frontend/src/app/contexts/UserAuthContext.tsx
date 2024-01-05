@@ -37,31 +37,16 @@ export const UserAuthProvider = ({ children }: PropsWithChildren): JSX.Element =
 };
 
 export const user: User = {
-  username: 'test',
+  username: 'test.user',
   firstName: 'Test',
   lastName: 'User',
+  thumbnailImage: 'https://avatars.githubusercontent.com/u/10000000?v=4',
   scopes: [],
-};
-
-export const adminUser: User = {
-  username: 'test',
-  firstName: 'Test',
-  lastName: 'User',
-  scopes: ['administrator'],
 };
 
 export const MockUserAuthProvider = ({ children }: PropsWithChildren) => (
   <UserAuthContext.Provider value={
     useMemo(() => ({ user, updateUser: () => ({}) }), [])
-    }
-  >
-    {children}
-  </UserAuthContext.Provider>
-);
-
-export const MockAdminAuthProvider = ({ children }: PropsWithChildren) => (
-  <UserAuthContext.Provider value={
-    useMemo(() => ({ user: adminUser, updateUser: () => ({}) }), [])
     }
   >
     {children}

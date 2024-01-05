@@ -1,20 +1,21 @@
-import React from "react";
-import { Button, Code, Group, Menu, NavLink, ScrollArea, UnstyledButton, rem, useMantineColorScheme } from "@mantine/core";
+import React, { useContext } from "react";
+import { Button, Group, Menu, NavLink, ScrollArea, rem, useMantineColorScheme } from "@mantine/core";
 import UserButton from "./components/UserButton/UserButton";
 import classes from './NavPanel.module.css';
 import { useNavigate } from "react-router-dom";
 import { IconDoorExit, IconFolders, IconHome2, IconMoon, IconSettings, IconSun, IconUsersGroup } from "@tabler/icons-react";
+import { UserAuthContext } from "../../app/contexts/UserAuthContext";
 
 const NavPanel = () => {
   const navigate = useNavigate();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
-
+  const { user } = useContext(UserAuthContext);
   return (
     <nav className={classes.navbar}>
       <div className={classes.header}>
         <Group justify="space-between">
+          {/* Project name */}
           <span>DCSM</span>
-          {/* <Code fw={700}>v0.1a</Code> */}
           {/* Light/dark mode toggle button */}
           <Button
             onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
@@ -59,9 +60,9 @@ const NavPanel = () => {
 
       <div className={classes.footer}>
         {/* User menu */}
-        <Menu position="right-end" withArrow>
+        <Menu position="right-end" disabled={!user}>
           <Menu.Target>
-            <UserButton name="Joe Channing" email="jcf@test.local" avatarUrl="https://avatars.githubusercontent.com/u/47789741?v=4" />
+            <UserButton />
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Label>
