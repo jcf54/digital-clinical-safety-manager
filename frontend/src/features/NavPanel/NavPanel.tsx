@@ -1,18 +1,33 @@
 import React from "react";
-import { Code, Group, Menu, NavLink, ScrollArea, rem } from "@mantine/core";
+import { Button, Code, Group, Menu, NavLink, ScrollArea, UnstyledButton, rem, useMantineColorScheme } from "@mantine/core";
 import UserButton from "./components/UserButton/UserButton";
 import classes from './NavPanel.module.css';
 import { useNavigate } from "react-router-dom";
-import { IconDoorExit, IconFolders, IconHome2, IconSettings, IconUsersGroup } from "@tabler/icons-react";
+import { IconDoorExit, IconFolders, IconHome2, IconMoon, IconSettings, IconSun, IconUsersGroup } from "@tabler/icons-react";
 
 const NavPanel = () => {
   const navigate = useNavigate();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+
   return (
     <nav className={classes.navbar}>
       <div className={classes.header}>
         <Group justify="space-between">
           <span>DCSM</span>
-          <Code fw={700}>v0.1a</Code>
+          {/* <Code fw={700}>v0.1a</Code> */}
+          {/* Light/dark mode toggle button */}
+          <Button
+            onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+            variant="outline"
+            color="darkgray"
+            size="xs"
+          >
+            {colorScheme === 'dark' ? (
+              <IconSun size="1rem" stroke={1.5} />
+            ) : (
+              <IconMoon size="1rem" stroke={1.5} />
+            )}
+          </Button>
         </Group>
       </div>
 
