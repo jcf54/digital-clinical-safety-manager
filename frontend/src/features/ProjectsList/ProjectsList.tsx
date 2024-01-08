@@ -38,7 +38,7 @@ const ProjectsList = () => {
                   <NavLink
                     label={project.name}
                     p={0}
-                    leftSection={project.id === 1 ? <IconCheck size={20} color="green" /> : <IconAlertTriangle size={20} color="red" />}
+                    leftSection={project.id === 1 ? <IconCheck size={20} color="green" /> : <IconExclamationMark size={20} color="red" />}
                     className={classes.noHoverBackground}
                   />
                 </Table.Td>
